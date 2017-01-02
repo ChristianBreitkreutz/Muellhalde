@@ -1,30 +1,13 @@
-function addToMakefile {
-    if ! grep --quiet "$1[: ]" $cartridgename/Makefile.PL; then
-      echo "add $1 to $cartridgename/Makefile.PL."
-      sed -i -e "s/coverage_report/$1 coverage_report/" $cartridgename/Makefile.PL
-    fi
-    if ! grep --quiet "$1[: ]" $cartridgename/Makefile.PL; then
-      echo "$cartridgename/Makefile.PL dont contain $1 section"
-    fi
-}
-
-ls -d */ | cut -f1 -d'/' | while read cartridgename
+filename="Makefile.PL"
+ls -d */ | cut -f1 -d'/' | while read foldername
 do
-  if [ -a $cartridgename/Makefile.PL ];then
-    # init 
-    if ! grep --quiet "coverage_report[: ]" $cartridgename/Makefile.PL; then
-      echo "add coverage_report to $cartridgename/Makefile.PL"
-      sed -i -e 's/test: makefile/test coverage_report: makefile/' $cartridgename/Makefile.PL
+  if [ -a $foldername/$filename ];then
+    pattern="^test.*:.*makefile$"
+    replacestring="test unit_test integration_test regression_test test_coverage collect_coverage coverage_report critic_report sonar_report sonar_properties sonar_scan: makefile"
+    if ! grep --quiet "$replacestring" $foldername/$filename; then
+        echo "Changed $foldername/Makefile.PL."
+    	sed -i -e "s/$pattern/$replacestring/" $foldername/$filename
     fi
-    if ! grep --quiet "$1[: ]" $cartridgename/Makefile.PL; then
-      echo "$cartridgename/Makefile.PL dont contain $1 section"
-    fi
-    # all others
-    addToMakefile "regression_test"
-    addToMakefile "test_coverage"
-    addToMakefile "collect_coverage"
-    addToMakefile "unit_test"
-    addToMakefile "integration_test"
-    addToMakefile "sonar_report"
   fi
 done
+
