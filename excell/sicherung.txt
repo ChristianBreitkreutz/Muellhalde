@@ -1,0 +1,49 @@
+
+Sub AuftragLoeschen()
+    Dim activeRow As Integer
+    
+    activeRow = ActiveCell.Row
+    aendereBlechBestand (activeRow)
+    löscheAuftrag (activeRow)
+    
+End Sub
+
+Sub aendereBlechBestand(aktiveZeile As Integer)
+    Dim benutzeBlecheSpalte As Integer, blechtypSpalte As Integer
+    benutzeBlecheSpalte = 19
+    blechtypSpalte = 18
+    
+    Dim blechtypName As String, benutzeBlecheAnzahl As String
+    
+    blechtypName = Tabelle1.Cells(aktiveZeile, blechtypSpalte).Value
+    benutzeBlecheAnzahl = Val(Tabelle1.Cells(aktiveZeile, benutzeBlecheSpalte).Value)
+    
+    zeile = holeZeileInMaterialListe(blechtypName)
+    If zeile Then
+        Tabelle3.Cells(zeile, "Y").Value = Tabelle3.Cells(zeile, "Y").Value - benutzeBlecheAnzahl
+    Else
+        MsgBox ("'" + blechtypName + "' ist nicht in der Materialliste!")
+    End If
+    
+
+End Sub
+Sub löscheAuftrag(aktiveZeile As Integer)
+    Tabelle1.Rows(aktiveZeile).delete
+End Sub
+Function holeZeileInMaterialListe(blechtypName As String) As Integer
+
+    Dim längeMaterialListe As Integer, ersteMaterialZeile As Integer
+    ersteMaterialZeile = 7
+     
+    längeMaterialListe = Tabelle3.Cells(Rows.Count, "P").End(xlUp).Row
+    
+    Dim zeile As Integer, nameInZeile As String
+    For zeile = ersteMaterialZeile To längeMaterialListe Step 1
+        nameInZeile = Tabelle3.Cells(zeile, "P").Value
+        If LCase(nameInZeile) = LCase(blechtypName) Then
+            holeZeileInMaterialListe = zeile
+            Exit Function
+        End If
+    Next zeile
+    
+End Function
